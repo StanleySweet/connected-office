@@ -1,0 +1,4 @@
+[submodule "vendor/theoffice-agents"]
+	path = vendor/theoffice-agents
+	url = https://github.com/StanleySweet/theoffice-agents.git
+	branch = feat/connected-office-features

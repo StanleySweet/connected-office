@@ -1,0 +1,31 @@
+# The relay alone, on the loopback: the reverse proxy is the only thing that reaches it. This file is what `start.sh`
+# and `stop.sh` drive; copy the service block into your own stack if you have one.
+services:
+  relay:
+    image: connected-office:${CONNECTED_OFFICE_TAG:-latest}
+    platform: linux/amd64
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:7311:7311"
+    environment:
+      PORT: 7311
+      CACHE_DIR: /data
+      OFFICE_TZ: Europe/Paris
+      TOKENS_FILE: /run/secrets/tokens
+    volumes:
+      - relay-data:/data
+      - ./tokens:/run/secrets/tokens:ro
+    mem_limit: 128m
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:7311/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  relay-data:

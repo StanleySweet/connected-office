@@ -1,0 +1,24 @@
+# The relay is meant to sit behind a TLS reverse proxy; this Caddy block is an example, adapt it.
+#
+#   - Viewers authenticate at the proxy (basic auth below, or forward_auth to your own SSO). The relay itself only
+#     checks the X-Office-User header the proxy sets, and refuses any viewer request without it.
+#   - The proxy overwrites X-Office-User, so a value sent by a client never reaches the relay.
+#   - /ingest/* skips viewer auth: each laptop carries its own bearer token, checked by the relay.
+#   - encode: the drawing is ~80 KB of SVG per refresh, gzip takes it to ~17 KB.
+office.example.com {
+	encode zstd gzip
+	handle /ingest/* {
+		reverse_proxy relay:7311 {
+			header_up -X-Office-User
+		}
+	}
+	handle {
+		basic_auth {
+			# caddy hash-password
+			viewer REPLACE_WITH_HASH
+		}
+		reverse_proxy relay:7311 {
+			header_up X-Office-User viewer
+		}
+	}
+}

@@ -1,0 +1,14 @@
+{
+  "relay": "https://office.example.com",
+  "token": "REPLACE_WITH_THIS_LAPTOPS_PSK",
+  "every": {
+    "live": 60,
+    "today": 60,
+    "week": 60,
+    "work": 300,
+    "month": 300,
+    "timelapse": 300
+  },
+  "exclude": [],
+  "only_under": []
+}

@@ -1,0 +1,15 @@
+id: old-session-002
+cwd: /Users/test/Dev/project-b
+git_root: /Users/test/Dev/project-b
+branch: feature-old
+client_name: github/cli
+last_client_name: github/cli
+name: Old Stale Session
+user_named: true
+summary_count: 1
+fork_count: 0
+created_at: 2026-11-09T10:00:00.000Z
+updated_at: 2026-11-10T05:00:00.000Z
+remote_steerable: false
+mc_task_id: task-002
+mc_session_id: old-session-002

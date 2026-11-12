@@ -1,0 +1,5 @@
+# One line per person: <psk> <label>. chmod 600, never committed.
+# Generate with: openssl rand -base64 32
+# Revoking a person is deleting their line and running ./stop.sh && ./start.sh.
+REPLACE_ME_alice_psk alice
+REPLACE_ME_bob_psk bob

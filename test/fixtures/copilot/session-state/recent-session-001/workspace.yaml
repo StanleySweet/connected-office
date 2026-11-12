@@ -1,0 +1,15 @@
+id: recent-session-001
+cwd: /Users/test/Dev/project-a
+git_root: /Users/test/Dev/project-a
+branch: main
+client_name: github/cli
+last_client_name: github/cli
+name: Recent Working Session
+user_named: false
+summary_count: 2
+fork_count: 0
+created_at: 2026-11-11T10:00:00.000Z
+updated_at: 2026-11-11T14:00:00.000Z
+remote_steerable: false
+mc_task_id: task-001
+mc_session_id: recent-session-001
