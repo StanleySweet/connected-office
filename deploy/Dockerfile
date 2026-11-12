@@ -10,8 +10,9 @@ ENV TZ=Europe/Paris \
 
 WORKDIR /app
 COPY relay ./relay
-# The relay only draws: the plugin's lib/ (submodule vendor/theoffice-agents), not the whole upstream repo.
+# The relay only draws: the plugin's lib/ and themes/ (lib imports ../themes/default.json), not the whole upstream repo.
 COPY vendor/theoffice-agents/plugin/lib ./vendor/theoffice-agents/plugin/lib
+COPY vendor/theoffice-agents/plugin/themes ./vendor/theoffice-agents/plugin/themes
 COPY vendor/theoffice-agents/LICENSE ./vendor/theoffice-agents/LICENSE
 
 RUN mkdir -p /data && chown node:node /data
