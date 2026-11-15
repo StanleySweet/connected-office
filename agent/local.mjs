@@ -18,7 +18,7 @@ const tick = async () => {
   for (const [view, seconds] of Object.entries(DEFAULT_EVERY)) {
     if (last[view] && Date.now() - last[view] < seconds * 1000) continue
     last[view] = Date.now()
-    try { await pushOnce({ relay: relay.url, token, view, file, sent }) } catch (error) { console.error(`${new Date().toISOString()} ${view} failed: ${error.message}`) }
+    try { await pushOnce({ relay: relay.url, token, view, file, sent, keepTitles: true }) } catch (error) { console.error(`${new Date().toISOString()} ${view} failed: ${error.message}`) }
   }
 }
 await tick()

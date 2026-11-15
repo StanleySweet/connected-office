@@ -33,3 +33,15 @@ test('each timelapse range is collected, stored and drawn as its own view', () =
     assert.deepEqual(collectArgs(view), range === 'week' ? ['timelapse'] : ['timelapse', range])
   }
 })
+
+test('session titles are redacted by default and kept only when asked (the local relay asks)', async () => {
+  const { gunzipSync } = await import('node:zlib')
+  const withDesk = { ...facts('10:00', 1), live: { desks: [{ id: 'a', agent: 'omp', project: 'p', title: 'Fix the parser' }] } }
+  const body = async (keepTitles) => {
+    let sent
+    await pushOnce({ relay: 'https://r', token: 't', view: 'live', facts: withDesk, keepTitles, sent: {}, fetchImpl: async (_u, o) => { sent = JSON.parse(gunzipSync(o.body)); return { ok: true, status: 202 } } })
+    return sent.live.desks[0].title
+  }
+  assert.notEqual(await body(false), 'Fix the parser')
+  assert.equal(await body(true), 'Fix the parser')
+})
