@@ -45,3 +45,19 @@ test('session titles are redacted by default and kept only when asked (the local
   assert.notEqual(await body(false), 'Fix the parser')
   assert.equal(await body(true), 'Fix the parser')
 })
+
+test('a local relay keeps session titles on arrival, a shared one drops them', async () => {
+  const { startRelay } = await import('../relay/server.mjs')
+  const { push } = await import('./helpers/relay.mjs')
+  const { factsOf, deskOf } = await import('./helpers/facts.mjs')
+  const shown = async (localViewer) => {
+    const r = await startRelay({ port: 0, tokens: { t: 'stan' }, localViewer })
+    try {
+      await push(r, { token: 't', facts: factsOf({ desks: [deskOf('proj', { title: 'Fix the parser' })] }) })
+      const snap = await (await fetch(`${r.url}/snapshot`, { headers: localViewer ? {} : { 'X-Office-User': 'caddy' } })).json()
+      return snap.text.includes('Fix the parser')
+    } finally { await r.close() }
+  }
+  assert.equal(await shown(true), true)
+  assert.equal(await shown(false), false)
+})
