@@ -155,7 +155,7 @@ export async function startRelay({ port = 7311, host = '127.0.0.1', tokens = {},
         if (!facts || typeof facts !== 'object') return send(400, 'Invalid facts')
         // A different spec means a different shape: keep the previous facts rather than draw a half-understood office.
         if (facts.spec !== SPEC) return send(409, `This relay speaks ${SPEC}`)
-        store.put(label, view, redact(facts))
+        store.put(label, view, redact(facts, { keepTitles: localViewer })) // a local relay is for its owner only: session titles stay
         drawings.clear()
         broadcast('change', { label, view })
         return send(202, 'Accepted')
