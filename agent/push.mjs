@@ -49,9 +49,9 @@ export const RESEND_MS = 15 * 60_000
  * Collect, filter, redact and push one view. `sent` (per view: { hash, at }) skips a push whose facts did not change
  * since the last one, unless it is RESEND_MS old; the skip is reported as 'unchanged'.
  */
-export async function pushOnce({ relay, token, view, file, exclude = [], onlyUnder = [], sent = {}, nowMs = Date.now(), fetchImpl = fetch, facts: given }) {
+export async function pushOnce({ relay, token, view, file, exclude = [], onlyUnder = [], keepTitles = false, sent = {}, nowMs = Date.now(), fetchImpl = fetch, facts: given }) {
   const raw = given ?? await collect(file, view)
-  const facts = redact(excludeProjects(raw, [...exclude, ...namesOutside(raw, onlyUnder, os.homedir())]))
+  const facts = redact(excludeProjects(raw, [...exclude, ...namesOutside(raw, onlyUnder, os.homedir())]), { keepTitles })
   const hash = fingerprint(facts)
   const prev = sent[view]
   if (prev && prev.hash === hash && nowMs - prev.at < RESEND_MS) return 'unchanged'
