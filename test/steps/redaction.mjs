@@ -30,6 +30,15 @@ feature(new URL('../../features/redaction.feature', import.meta.url).pathname, {
   'hour 8 still counts 20 agent minutes': (ctx) => assertEqual(ctx.redacted.per_hour[8], 20, 'minutes of hour 8'),
   'the agent redacts them keeping titles': (ctx) => { ctx.redacted = redact(ctx.facts, { keepTitles: true }) },
 
+  'facts with a titled desk, a branch, a project path and a commit subject': (ctx) => {
+    ctx.facts = factsOf({
+      desks: [deskOf(ROOM, { title: 'Client contract review', branch: 'feat/private-thing', project_path: '/Users/alice/Dev/private', worktree: 'w' })],
+      projects: [{ ...projectOf(ROOM), top_commits: [{ subject: 'fix: rotate the api key' }] }],
+    })
+  },
+  'the agent redacts them keeping only titles': (ctx) => { ctx.redacted = redact(ctx.facts, { keepTitles: 'titles' }) },
+  'no desk carries a project path': (ctx) => assert(!('project_path' in ctx.redacted.live.desks[0]) && !('worktree' in ctx.redacted.live.desks[0]), 'a path survived'),
+
   'no desk carries a title': (ctx) => assert(!ctx.redacted.live.desks.some((d) => 'title' in d), 'a title survived'),
   'the desk still names its project': (ctx) => assertEqual(ctx.redacted.live.desks[0].project, ROOM, 'project'),
   'the desk carries the title "Client contract review"': (ctx) => assertEqual(ctx.redacted.live.desks[0].title, 'Client contract review', 'title'),

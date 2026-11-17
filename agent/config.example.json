@@ -10,5 +10,6 @@
     "timelapse": 300
   },
   "exclude": [],
-  "only_under": []
+  "only_under": [],
+  "keep_titles": false
 }

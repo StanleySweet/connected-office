@@ -11,6 +11,7 @@ services:
       PORT: 7311
       CACHE_DIR: /data
       OFFICE_TZ: Europe/Paris
+      # OFFICE_KEEP_TITLES: titles   # show session titles on the page (and nothing else of the prose); see README
       TOKENS_FILE: /run/secrets/tokens
     volumes:
       - relay-data:/data

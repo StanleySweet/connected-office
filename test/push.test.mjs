@@ -61,3 +61,46 @@ test('a local relay keeps session titles on arrival, a shared one drops them', a
   assert.equal(await shown(true), true)
   assert.equal(await shown(false), false)
 })
+
+// A desk with a title and everything else a full keep-titles push would carry.
+const chatty = async () => {
+  const { factsOf, deskOf } = await import('./helpers/facts.mjs')
+  return factsOf({ desks: [deskOf('proj', { title: 'Fix the parser', branch: 'feat/secret', project_path: '/home/alice/proj', worktree: 'wt', meetings: [{ phase: 'open', name: 'Budget talk' }] })] })
+}
+
+test('the agent sends no title by default and only titles with keep_titles "titles"', async () => {
+  const { gunzipSync } = await import('node:zlib')
+  const sentBy = async (keepTitles) => {
+    let sent
+    await pushOnce({ relay: 'https://r', token: 't', view: 'live', facts: await chatty(), keepTitles, sent: {}, fetchImpl: async (_u, o) => { sent = JSON.parse(gunzipSync(o.body)); return { ok: true, status: 202 } } })
+    return sent.live.desks[0]
+  }
+  assert.equal('title' in await sentBy(undefined), false)
+  // A misspelt config value fails closed: it strips like the default, it never sends the broad set.
+  for (const bad of ['false', 'yes', 1, 'title', 'TITLES']) {
+    const d = await sentBy(bad)
+    assert.equal('title' in d, false, String(bad))
+    for (const k of ['branch', 'project_path', 'worktree']) assert.equal(k in d, false, `${String(bad)} ${k}`)
+  }
+  const desk = await sentBy('titles')
+  assert.equal(desk.title, 'Fix the parser')
+  for (const k of ['branch', 'project_path', 'worktree']) assert.equal(k in desk, false, k)
+  assert.equal('name' in desk.meetings[0], false)
+})
+
+test('a shared relay drops titles unless opted in, and then keeps only titles', async () => {
+  const { startRelay } = await import('../relay/server.mjs')
+  const { push } = await import('./helpers/relay.mjs')
+  const stored = async (keepTitles) => {
+    const r = await startRelay({ port: 0, tokens: { t: 'bob' }, keepTitles })
+    try {
+      await push(r, { token: 't', facts: await chatty() }) // an agent that sent everything
+      return JSON.stringify(r.store.get('bob', 'live'))
+    } finally { await r.close() }
+  }
+  const off = await stored(false)
+  assert.equal(off.includes('Fix the parser'), false)
+  const narrow = await stored('titles')
+  assert.equal(narrow.includes('Fix the parser'), true)
+  for (const secret of ['feat/secret', '/home/alice', 'Budget talk']) assert.equal(narrow.includes(secret), false, secret)
+})
