@@ -76,6 +76,12 @@ test('the agent sends no title by default and only titles with keep_titles "titl
     return sent.live.desks[0]
   }
   assert.equal('title' in await sentBy(undefined), false)
+  // A misspelt config value fails closed: it strips like the default, it never sends the broad set.
+  for (const bad of ['false', 'yes', 1, 'title', 'TITLES']) {
+    const d = await sentBy(bad)
+    assert.equal('title' in d, false, String(bad))
+    for (const k of ['branch', 'project_path', 'worktree']) assert.equal(k in d, false, `${String(bad)} ${k}`)
+  }
   const desk = await sentBy('titles')
   assert.equal(desk.title, 'Fix the parser')
   for (const k of ['branch', 'project_path', 'worktree']) assert.equal(k in desk, false, k)

@@ -59,7 +59,8 @@ function walk(value, path, allow) {
 /** The facts with every text field the drawing does not read removed. Pure: never mutates its input. */
 export function redact(facts, { keepTitles = false } = {}) {
   if (!facts || typeof facts !== 'object') return facts
-  const extra = keepTitles === 'titles' ? SESSION_TITLES : keepTitles ? TITLES : null
+  // Fail closed: only `true` and 'titles' keep anything. A misspelt config value ("false", "yes", 1) strips like the default.
+  const extra = keepTitles === 'titles' ? SESSION_TITLES : keepTitles === true ? TITLES : null
   const allow = extra ? new Set([...ALLOW, ...extra]) : ALLOW
   return walk(facts, '', allow)
 }
