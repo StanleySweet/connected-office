@@ -27,6 +27,15 @@ Feature: Keeping private text on the machine
     When the agent redacts them keeping titles
     Then the desk carries the title "Client contract review"
 
+  Scenario: Only session titles can be kept
+    Given facts with a titled desk, a branch, a project path and a commit subject
+    When the agent redacts them keeping only titles
+    Then the desk carries the title "Client contract review"
+    And no desk carries a branch
+    And no project carries a path
+    And no project carries commit subjects
+    And no desk carries a project path
+
   Scenario: An excluded project never leaves
     Given facts with a desk and a project "side-project" and a desk in "connected-office"
     When the agent excludes "SIDE-PROJECT" and redacts them

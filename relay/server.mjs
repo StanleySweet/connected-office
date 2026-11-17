@@ -72,9 +72,11 @@ function readBody(req, limit) {
   })
 }
 
+// `keepTitles`: what a shared relay keeps of an agent's session titles (false, or 'titles' for session titles only); it
+// redacts again on arrival, so whatever an agent sent beyond that is dropped.
 // `localViewer`: a relay bound to the loopback for one person's own machine (agent/local.mjs) has no Caddy in front to set
 // X-Office-User; it trusts its viewers, and refuses to start that way on any other address.
-export async function startRelay({ port = 7311, host = '127.0.0.1', tokens = {}, dir = null, localViewer = false } = {}) {
+export async function startRelay({ port = 7311, host = '127.0.0.1', tokens = {}, dir = null, localViewer = false, keepTitles = false } = {}) {
   if (localViewer && host !== '127.0.0.1') throw new Error('localViewer needs host 127.0.0.1')
   const store = createStore({ dir })
   const clients = new Set()
@@ -155,7 +157,7 @@ export async function startRelay({ port = 7311, host = '127.0.0.1', tokens = {},
         if (!facts || typeof facts !== 'object') return send(400, 'Invalid facts')
         // A different spec means a different shape: keep the previous facts rather than draw a half-understood office.
         if (facts.spec !== SPEC) return send(409, `This relay speaks ${SPEC}`)
-        store.put(label, view, redact(facts, { keepTitles: localViewer })) // a local relay is for its owner only: session titles stay
+        store.put(label, view, redact(facts, { keepTitles: localViewer ? true : keepTitles })) // a local relay is for its owner only: everything stays
         drawings.clear()
         broadcast('change', { label, view })
         return send(202, 'Accepted')
@@ -232,7 +234,8 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const port = Number(process.env.PORT ?? 7311)
   const dir = process.env.CACHE_DIR ?? '/data'
   // HOST=0.0.0.0 in the image: a container's loopback is unreachable from Caddy or from a published port.
-  startRelay({ port, host: process.env.HOST ?? '127.0.0.1', tokens: tokensFrom(process.env.TOKENS_FILE), dir })
-    .then(({ url }) => console.log(`connected-office relay on ${url}, cache ${dir}`))
+  const keepTitles = process.env.OFFICE_KEEP_TITLES === 'titles' ? 'titles' : false
+  startRelay({ port, host: process.env.HOST ?? '127.0.0.1', tokens: tokensFrom(process.env.TOKENS_FILE), dir, keepTitles })
+    .then(({ url }) => console.log(`connected-office relay on ${url}, cache ${dir}, session titles ${keepTitles ? 'shown' : 'hidden'}`))
     .catch((error) => { console.error(error.message); process.exit(1) })
 }

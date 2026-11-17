@@ -82,7 +82,7 @@ async function main() {
       if (last[view] && Date.now() - last[view] < seconds * 1000) continue
       last[view] = Date.now()
       try {
-        const status = await pushOnce({ relay: config.relay, token: config.token, view, file, exclude: config.exclude, onlyUnder: config.only_under, sent })
+        const status = await pushOnce({ relay: config.relay, token: config.token, view, file, exclude: config.exclude, onlyUnder: config.only_under, keepTitles: config.keep_titles, sent })
         console.log(`${new Date().toISOString()} ${view} ${status}`)
       } catch (error) {
         // The relay keeps the last good facts; a failed push is retried at the next tick.

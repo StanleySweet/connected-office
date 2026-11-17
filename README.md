@@ -32,6 +32,15 @@ Put a TLS reverse proxy in front (see `deploy/Caddyfile.extrait`). It must authe
 If the same repository has a different folder name on each machine, map the names to one room with the
 `PROJECT_ALIASES` environment variable, for example `{"my-repo-clone":"my-repo"}`.
 
+### Session titles
+
+By default no session title leaves a laptop and the relay drops any that arrives. To show them on a shared page, opt in
+on both sides: `"keep_titles": "titles"` in the agent's `config.json` and `OFFICE_KEEP_TITLES=titles` on the relay.
+Only the titles are added (desks, recently left, per-project titles); paths, branches, worktrees, commit subjects,
+intern descriptions and meeting names stay hidden, and the relay strips anything else an agent sends.
+The trade-off: a title is the first prompt line or a summary of it, so it can name a client, a ticket or a secret;
+every viewer of the page and everyone with relay disk access reads it. Use it only for a small trusted group.
+
 ## Run an agent
 
 ```

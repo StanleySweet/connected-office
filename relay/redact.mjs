@@ -34,6 +34,9 @@ const TITLES = [
   'projects.path', 'projects.titles', 'projects.top_commits.subject', 'projects.worktrees', 'timeline.desks.title',
 ]
 
+/** What `keepTitles: 'titles'` adds back: session names only, no path, branch, worktree, commit subject or description. */
+const SESSION_TITLES = ['live.desks.title', 'live.recently_left.title', 'timeline.desks.title', 'projects.titles']
+
 /** Never kept, even as a number: a process id names nothing the drawing needs. */
 const DROP = new Set(['pid'])
 
@@ -56,7 +59,8 @@ function walk(value, path, allow) {
 /** The facts with every text field the drawing does not read removed. Pure: never mutates its input. */
 export function redact(facts, { keepTitles = false } = {}) {
   if (!facts || typeof facts !== 'object') return facts
-  const allow = keepTitles ? new Set([...ALLOW, ...TITLES]) : ALLOW
+  const extra = keepTitles === 'titles' ? SESSION_TITLES : keepTitles ? TITLES : null
+  const allow = extra ? new Set([...ALLOW, ...extra]) : ALLOW
   return walk(facts, '', allow)
 }
 
