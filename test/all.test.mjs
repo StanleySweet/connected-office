@@ -10,6 +10,7 @@ import './steps/deploy.mjs'
 import './split.test.mjs'
 import './push.test.mjs'
 import './copilot.test.mjs'
+import './vibe.test.mjs'
 import './timeline.test.mjs'
 
 after(closeAll)

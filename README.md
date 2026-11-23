@@ -3,7 +3,8 @@
 Several people, one [The Office](https://github.com/Makio64/theoffice-agents). Each laptop pushes its coding-agent
 activity to a small relay, the relay merges everybody's facts and draws one shared office.
 
-- `agent/`: runs on each laptop, collects the facts with `theoffice-agents`, redacts them (`relay/redact.mjs`) and pushes
+- `agent/`: runs on each laptop, collects the facts with `theoffice-agents` (Claude Code, Codex, Gemini/Antigravity, Cursor,
+  Kimi, Grok, opencode, omp, GitHub Copilot CLI and Mistral Vibe each get their own character), redacts them (`relay/redact.mjs`) and pushes
   them every minute or so. `local.mjs` runs a private relay on the laptop alone.
 - `relay/`: a single Node process, no dependencies. Keeps each person's last push, merges them, serves the SVG, ASCII
   and time-lapse views.
