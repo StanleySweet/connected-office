@@ -89,13 +89,13 @@ test('a Vibe session whose lock is gone is on the coat rack, not at a desk', asy
 test('a pushed Vibe desk reaches the relay and is drawn as Vex', async () => {
   const relay = await startTestRelay({ tokens: { t: 'stan' } })
   try {
-    const facts = factsOf({ desks: [deskOf('fallout-gn2', { agent: 'vibe', title: 'Vibe at work' })], accounts: [{ agent: 'vibe', label: null, minutes: 12, sessions: 1, live: 1 }] })
+    const facts = factsOf({ desks: [deskOf('app', { agent: 'vibe', title: 'Vibe at work' })], accounts: [{ agent: 'vibe', label: null, minutes: 12, sessions: 1, live: 1 }] })
     const res = await push(relay, { token: 't', facts })
     assert.equal(res.status, 202)
     const snap = await (await fetch(`${relay.url}/snapshot`, { headers: PROXY_HEADER })).json()
     assert.match(snap.text, /▐V▌/)
     assert.match(snap.svg, /#to-vb[A-Z0-9]/)
-    assert.match(snap.text, /Vibe at work|fallout-gn2/)
+    assert.match(snap.text, /Vibe at work|app/)
   } finally {
     await closeRelay(relay)
   }
